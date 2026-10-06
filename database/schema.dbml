@@ -1,0 +1,28 @@
+Table users {
+  id uuid [pk, default: `gen_random_uuid()`]
+  firebase_uid varchar(255) [unique, not null]
+  email varchar(255) [unique, not null]
+  name varchar(255)
+  created_at timestamp [default: `now()`]
+}
+
+Table tasks {
+  id uuid [pk, default: `gen_random_uuid()`]
+  title varchar(255) [not null]
+  description text
+  completed boolean [default: false]
+  owner_id uuid [not null]
+  created_at timestamp [default: `now()`]
+  updated_at timestamp [default: `now()`]
+}
+
+Table task_shares {
+  id uuid [pk, default: `gen_random_uuid()`]
+  task_id uuid [not null]
+  shared_with_user_id uuid [not null]
+  created_at timestamp [default: `now()`]
+}
+
+Ref: tasks.owner_id > users.id
+Ref: task_shares.task_id > tasks.id
+Ref: task_shares.shared_with_user_id > users.id
