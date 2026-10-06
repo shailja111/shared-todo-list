@@ -14,11 +14,18 @@ const shareEmail = ref("");
 
 onMounted(() => store.fetchTasks());
 
-const filtered = computed(() => store.tasks.filter(t => {
-  if (filter.value === "my") return t.owner_email === auth.user?.email;
-  if (filter.value === "shared") return t.owner_email !== auth.user?.email;
-  return true;
-}));
+const filtered = computed(() => {
+  const currentEmail = auth.user?.email?.toLowerCase();
+
+  return store.tasks.filter((t) => {
+    const isOwner = t.owner_email?.toLowerCase() === currentEmail;
+
+    if (filter.value === "my") return isOwner;
+    if (filter.value === "shared") return !isOwner;
+
+    return true;
+  });
+});
 
 async function addTask() {
   if (!title.value.trim()) return;
@@ -75,11 +82,11 @@ async function share() {
           <small>Owner: {{ task.owner_email }}</small>
         </div>
         <button
-          v-if="task.owner_email === auth.user?.email"
+          v-if="task.owner_email?.toLowerCase() === auth.user?.email?.toLowerCase()"
           @click="shareId = task.id"
         >Share</button>
         <button
-          v-if="task.owner_email === auth.user?.email"
+          v-if="task.owner_email?.toLowerCase() === auth.user?.email?.toLowerCase()"
           @click="store.deleteTask(task.id)"
         >Delete</button>
       </div>

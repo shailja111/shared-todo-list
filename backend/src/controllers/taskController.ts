@@ -31,10 +31,21 @@ export async function createTask(req: AuthenticatedRequest, res: Response) {
     if (!title?.trim()) return res.status(400).json({ message: "Title is required" });
 
     const result = await pool.query(
-      `INSERT INTO tasks (title,description,owner_id) VALUES ($1,$2,$3) RETURNING *`,
-      [title.trim(), description, id]
-    );
-    res.status(201).json(result.rows[0]);
+  `INSERT INTO tasks (title,description,owner_id)
+   VALUES ($1,$2,$3)
+   RETURNING *`,
+  [title.trim(), description, id]
+);
+
+const task = await pool.query(
+  `SELECT t.*, u.email AS owner_email
+   FROM tasks t
+   JOIN users u ON u.id = t.owner_id
+   WHERE t.id = $1`,
+  [result.rows[0].id]
+);
+
+res.status(201).json(task.rows[0]);
   } catch {
     res.status(500).json({ message: "Unable to create task" });
   }

@@ -19,9 +19,9 @@ export const useTaskStore = defineStore("tasks", {
       finally { this.loading = false; }
     },
     async createTask(title: string, description: string) {
-      const task = (await api.post("/tasks", { title, description })).data;
-      this.tasks.unshift(task);
-    },
+  const task = (await api.post("/tasks", { title, description })).data;
+  this.tasks.unshift(task);
+},
     async updateTask(id: string, data: object) {
       const task = (await api.put(`/tasks/${id}`, data)).data;
       const index = this.tasks.findIndex(t => t.id === id);
